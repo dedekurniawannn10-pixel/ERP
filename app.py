@@ -7,67 +7,149 @@ from streamlit_option_menu import option_menu
 if 'logged_in' not in st.session_state:
     st.session_state.logged_in = False
 
-def login_form():
-    st.markdown(
-        """
-        <style>
-        /* Mengubah background luar menjadi Biru Tua Gelap (#0f1e36) */
-        [data-testid="stAppViewContainer"] {
-            background-color: #0f1e36;
-        }
-        
-        /* Kotak login dibuat sedikit lebih terang dari background luar agar kontras */
-        .login-box {
-            background-color: #172a45;
-            padding: 35px;
-            border-radius: 12px;
-            border: 1px solid #10b981; /* Border Hijau Emerald */
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-        }
-        
-        /* Gaya tombol Hijau Emerald */
-        div.stButton > button {
-            background-color: #10b981 !important;
-            color: white !important;
-            border: none !important;
-            border-radius: 6px !important;
-            font-weight: bold !important;
-            transition: 0.3s;
-        }
-        
-        /* Efek hover tombol */
-        div.stButton > button:hover {
-            background-color: #059669 !important;
-            box-shadow: 0 0 12px #10b981;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
+st.set_page_config(page_title="Login Sistem", layout="centered")
 
-    col1, col2, col3 = st.columns([1, 2, 1])
+# 2. CSS injector untuk membersihkan siluet putih & merapikan tombol mata password
+st.markdown(f"""
+    <style>
+    /* Mewarnai area bar atas (Header/Top Bar) agar tidak putih belang */
+    header, [data-testid="stHeader"] {{
+        background-color: #0f1e36 !important;
+    }}
     
-    with col2:
-        st.markdown('<div class="login-box">', unsafe_allow_html=True)
+    /* Mengubah warna teks/tombol bawaan di header atas (seperti tombol Deploy / Menu) */
+    [data-testid="stHeader"] button, [data-testid="stHeader"] a {{
+        color: #10b981 !important;
+    }}
+    
+    /* Latar belakang utama seluruh aplikasi */
+    .stApp {{
+        background-color: #0f1e36;
+    }}
+    
+    /* Kartu/Kotak Login Tengah - dibuat Pop-out proporsional */
+    [data-testid="stVerticalBlockBorderContainer"] {{
+        background-color: #132644 !important; /* Sedikit lebih terang dari bg utama agar berdimensi */
+        border: 1px solid #10b981 !important;
+        border-radius: 12px;
+        padding: 40px !important;
+        max-width: 450px;
+        margin: auto;
+        box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.4);
+    }}
+    
+    /* Label teks tulisan "Username" & "Password" */
+    label {{
+        color: #10b981 !important;
+        font-weight: 600 !important;
+        font-size: 14px !important;
+        margin-bottom: 6px;
+    }}
+    
+    /* =======================================================
+       PERBAIKAN TOTAL KOTAK INPUT & TOMBOL MATA PASSWORD
+       ======================================================= */
+       
+    /* Memaksa pembungkus luar input box agar berwarna gelap murni & border emerald */
+    [data-testid="stTextInputRootElement"] {{
+        background-color: #0f1e36 !important;
+        border: 1px solid #10b981 !important;
+        border-radius: 6px !important;
+    }}
+    
+    /* Membuang semua sisa siluet putih/abu bawaan Streamlit di dalam kotak */
+    [data-testid="stTextInputRootElement"] > div {{
+        background-color: transparent !important;
+        border: none !important;
+    }}
+    
+    /* Mengatur teks input ketikan di dalam kotak */
+    .stTextInput input {{
+        background-color: transparent !important;
+        color: #ffffff !important; /* Teks ketikan warna putih bersih */
+        border: none !important;
+        font-size: 15px !important;
+    }}
+    
+    /* Warna teks petunjuk (placeholder) di dalam kotak ketik */
+    .stTextInput input::placeholder {{
+        color: rgba(255, 255, 255, 0.4) !important;
+    }}
+    
+    /* Memaksa background tombol mata password menjadi transparan/gelap murni */
+    [data-testid="stTextInputRootElement"] button {{
+        background-color: transparent !important;
+        color: #10b981 !important; /* Ikon mata berwarna emerald full */
+        border: none !important;
+    }}
+    
+    /* Efek hover pada tombol mata */
+    [data-testid="stTextInputRootElement"] button:hover {{
+        color: #0d9668 !important;
+        background-color: transparent !important;
+    }}
+    
+    /* =======================================================
+       KUSTOMISASI TOMBOL 'MASUK' (Penuh & teks di tengah murni)
+       ======================================================= */
+    div[data-testid="stButton"] {{
+        width: 100% !important;
+    }}
+    
+    div[data-testid="stButton"] button {{
+        background-color: #10b981 !important;
+        color: #0f1e36 !important; /* Teks tombol gelap agar kontras tinggi */
+        border: none !important;
+        font-weight: bold !important;
+        font-size: 16px !important;
+        padding: 12px 0px !important;
+        border-radius: 6px !important;
         
-        try:
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        text-align: center !important;
+    }}
+    
+    /* Efek saat tombol disentuh mouse (Hover) */
+    div[data-testid="stButton"] button:hover {{
+        background-color: #0d9668 !important;
+        color: #ffffff !important;
+    }}
+    </style>
+""", unsafe_allow_html=True)
+
+def login_form():
+    with st.container(border=True):
+        
+        # Grid kolom untuk menaruh Logo CV GNET tepat di tengah atas kartu
+        col1, col2, col3 = st.columns([1, 3, 1])
+        with col2:
             st.image("cvgnet.png", use_container_width=True)
-        except Exception:
-            st.markdown("<div style='text-align: center;'><h3 style='color: #10b981;'>🔒 Login Sistem Gudang</h3></div>", unsafe_allow_html=True)
             
-        user = st.text_input("Username")
-        pwd = st.text_input("Password", type="password")
+        st.write("") # Spasi pemisah objek
         
-        st.markdown("<br>", unsafe_allow_html=True)
+        # Form Input Fields
+        user = st.text_input("Username", placeholder="Masukkan Username Anda")
+        pwd = st.text_input("Password", type="password", placeholder="Masukkan Password Anda")
         
+        st.write("") # Spasi sebelum tombol
+        
+        # Tombol Masuk menggunakan parameter use_container_width agar melebar otomatis
         if st.button("Masuk", use_container_width=True):
-            if user == "admin" and pwd == "gnet2712":
+            if user == "admin" and pwd == "gnet2712": 
                 st.session_state.logged_in = True
                 st.rerun()
             else:
                 st.error("Username/Password salah!")
-                
-        st.markdown('</div>', unsafe_allow_html=True)
+
+# Inisialisasi status login (Session State)
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+
+if not st.session_state.logged_in:
+    login_form()
+    st.stop()
 
 FILE_BARANG = "data_barang.csv"
 FILE_MASUK = "barang_masuk.csv"
