@@ -8,19 +8,66 @@ if 'logged_in' not in st.session_state:
     st.session_state.logged_in = False
 
 def login_form():
-    st.markdown("<div style='text-align: center;'><h3>🔐 Login Sistem Gudang</h3></div>", unsafe_allow_html=True)
-    user = st.text_input("Username")
-    pwd = st.text_input("Password", type="password")
-    if st.button("Masuk"):
-        if user == "admin" and pwd == "gnet2712": # Ganti password sesuai keinginan
-            st.session_state.logged_in = True
-            st.rerun()
-        else:
-            st.error("Username/Password salah!")
+    st.markdown(
+        """
+        <style>
+        /* Mengubah background luar menjadi Biru Tua Gelap (#0f1e36) */
+        [data-testid="stAppViewContainer"] {
+            background-color: #0f1e36;
+        }
+        
+        /* Kotak login dibuat sedikit lebih terang dari background luar agar kontras */
+        .login-box {
+            background-color: #172a45;
+            padding: 35px;
+            border-radius: 12px;
+            border: 1px solid #10b981; /* Border Hijau Emerald */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* Gaya tombol Hijau Emerald */
+        div.stButton > button {
+            background-color: #10b981 !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 6px !important;
+            font-weight: bold !important;
+            transition: 0.3s;
+        }
+        
+        /* Efek hover tombol */
+        div.stButton > button:hover {
+            background-color: #059669 !important;
+            box-shadow: 0 0 12px #10b981;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 
-if not st.session_state.logged_in:
-    login_form()
-    st.stop()
+    col1, col2, col3 = st.columns([1, 2, 1])
+    
+    with col2:
+        st.markdown('<div class="login-box">', unsafe_allow_html=True)
+        
+        try:
+            st.image("cvgnet.png", use_container_width=True)
+        except Exception:
+            st.markdown("<div style='text-align: center;'><h3 style='color: #10b981;'>🔒 Login Sistem Gudang</h3></div>", unsafe_allow_html=True)
+            
+        user = st.text_input("Username")
+        pwd = st.text_input("Password", type="password")
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        if st.button("Masuk", use_container_width=True):
+            if user == "admin" and pwd == "gnet2712":
+                st.session_state.logged_in = True
+                st.rerun()
+            else:
+                st.error("Username/Password salah!")
+                
+        st.markdown('</div>', unsafe_allow_html=True)
 
 FILE_BARANG = "data_barang.csv"
 FILE_MASUK = "barang_masuk.csv"
